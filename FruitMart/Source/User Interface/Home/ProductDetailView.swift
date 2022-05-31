@@ -12,6 +12,7 @@ struct ProductDetailView: View {
     let product: Product
     @State private var quantity: Int = 1
     @State private var showingAlert: Bool = false
+    @EnvironmentObject private var store: Store
     
     var body: some View {
         VStack(spacing: 0) {
@@ -109,7 +110,7 @@ struct ProductDetailView: View {
             title: Text("주문 확인"),
             message: Text("\(product.name)을(를) \(quantity)개 구매하시겠습니까?"),
             primaryButton: .default(Text("확인"), action: {
-                
+                self.store.placeOrder(product: product, quantity: quantity)
             }),
             secondaryButton: .cancel(Text("취소"))
         )
