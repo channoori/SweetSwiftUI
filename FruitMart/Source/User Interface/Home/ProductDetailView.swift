@@ -13,21 +13,23 @@ struct ProductDetailView: View {
     @State private var quantity: Int = 1
     @State private var showingAlert: Bool = false
     @EnvironmentObject private var store: Store
+    @State private var showingPopup: Bool = false
     
     var body: some View {
         VStack(spacing: 0) {
             productImage
             orderView
         }
+        .popup(isPresented: $showingPopup, content: {
+            OrderCompletedMessage()
+        })
         .edgesIgnoringSafeArea(.top)
         .alert(isPresented: $showingAlert) { confirmAlert }
     }
     
     var productImage: some View {
         GeometryReader { _ in
-            Image(self.product.imageName)
-                .resizable()
-                .scaledToFill()
+            ResizedImage(self.product.imageName)
         }
     }
     
@@ -91,6 +93,7 @@ struct ProductDetailView: View {
                     .foregroundColor(Color.white))
                 .padding(.vertical, 8)
         }
+        .buttonStyle(ShrinkButtonStyle())
     }
     
     func splitText(_ text: String) -> String {
@@ -110,10 +113,15 @@ struct ProductDetailView: View {
             title: Text("주문 확인"),
             message: Text("\(product.name)을(를) \(quantity)개 구매하시겠습니까?"),
             primaryButton: .default(Text("확인"), action: {
-                self.store.placeOrder(product: product, quantity: quantity)
+                self.placeOrder()
             }),
             secondaryButton: .cancel(Text("취소"))
         )
+    }
+    
+    func placeOrder() {
+        self.store.placeOrder(product: product, quantity: quantity)
+        self.showingPopup = true
     }
 }
 
